@@ -5,10 +5,20 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
+#define EVENT_BIT_BUTTON (1 << 0)
+#define LONG_PRESS_DELAY 3000 // 3 giây
+
+
+
+
 typedef void (*ButtonCallback_t)(void);
 
 void button_handler_init(gpio_num_t button_gpio, ButtonCallback_t callback);
 void button_handler_task(void *arg);
+void button_long_press_task(void *arg);
+
+TickType_t get_button_press_duration();
+
 
 
 

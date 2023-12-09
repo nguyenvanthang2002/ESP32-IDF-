@@ -7,9 +7,39 @@
 
 static SemaphoreHandle_t xButtonSemaphore = NULL;
 static ButtonCallback_t buttonCallback = NULL;
+TickType_t xButtonPressTime = 0;
+
+// Hàm để đọc thời gian nhấn nút và reset lại thời gian
+TickType_t get_button_press_duration() {
+    TickType_t current_time = xTaskGetTickCount();
+    TickType_t press_duration = current_time - xButtonPressTime;
+
+    // Reset lại thời gian nhấn
+    xButtonPressTime = current_time;
+
+    return press_duration;
+}
 
 static void IRAM_ATTR button_isr_handler(void *arg) {
     xSemaphoreGiveFromISR(xButtonSemaphore, NULL);
+}
+
+void button_long_press_task(void *arg) {
+    while (1) {
+        if (xSemaphoreTake(xButtonSemaphore, portMAX_DELAY)) {
+            TickType_t now = xTaskGetTickCount();
+
+            if ((now - xButtonPressTime) >= pdMS_TO_TICKS(LONG_PRESS_DELAY)) {
+                // Long press detected
+                if (buttonCallback != NULL) {
+                    buttonCallback();
+                }
+
+                // Reset lại thời gian nhấn
+                xButtonPressTime = now;
+            }
+        }
+    }
 }
 
 void button_handler_init(gpio_num_t button_gpio, ButtonCallback_t callback) {

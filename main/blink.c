@@ -9,6 +9,10 @@
 void button_pressed_callback(void) {
     // Xử lý khi nút được nhấn
     printf("Button pressed!\n");
+    TickType_t press_duration = get_button_press_duration();
+    printf("Button press duration: %u ms\n", press_duration);
+      // Reset lại thời gian nhấn
+    
 }
 
 void app_main(void) {
@@ -17,6 +21,7 @@ void app_main(void) {
 
     // Thêm các hành động chính của chương trình ở đây
     while (1) {
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+         printf("Button pressed!\n");
+        vTaskDelay(1000/ portTICK_PERIOD_MS);
     }
 }
